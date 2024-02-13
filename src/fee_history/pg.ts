@@ -1,9 +1,11 @@
 import { Client, QueryArrayConfig, QueryResult } from "pg";
 import { PgStore } from "../pg_store";
 import { FeeHistory } from "./interface";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 export class FeeHistoryStore {
-  private tableName = "feeHistory";
+  private tableName = "fee_history";
 
   async initTable(): Promise<void> {
     const checkTableExistsQuery = `
@@ -20,7 +22,7 @@ export class FeeHistoryStore {
       throw checkTableExist;
     }
 
-    const tableExists = checkTableExist.rows[0].EXISTS > 0;
+    const tableExists = checkTableExist.rows[0].exists;
 
     if (tableExists) {
       return;
@@ -43,12 +45,10 @@ export class FeeHistoryStore {
 
     //load data:
 
-    // const csvFilePath =
-    //   "/home/anorak/Documents/btc-fee-estimate-api-specific-23-02-13-to-24-02-13-1-to-2-blocks.csv";
-
-    // await this.store.copyCsvDataToTable(csvFilePath, this.tableName).catch((
-    //   error,
-    // ) => console.error("Error:", error));
+    const csvFilePath = process.env.FEE_HISTORY_FILE_PATH;
+    await PgStore.copyCsvDataToTable(csvFilePath, this.tableName).catch((
+      error,
+    ) => console.error("Error:", error));
   }
 
   async create(rowData: FeeHistory): Promise<boolean | Error> {
@@ -85,7 +85,7 @@ export class FeeHistoryStore {
     const query = `
     SELECT *
     FROM fee_history
-    ORDER BY datetime DESC
+    ORDER BY time DESC
     LIMIT 1;
 `;
     const result = await PgStore.execQuery(query);

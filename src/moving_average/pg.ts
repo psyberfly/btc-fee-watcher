@@ -3,7 +3,7 @@ import { MovingAverage } from "./interface";
 
 export class MovingAverageStore {
   
-  private tableName = "movingAverage";
+  private tableName = "moving_average";
 
   async initTable(): Promise<void> {
     const checkTableExistsQuery = `
@@ -20,7 +20,7 @@ export class MovingAverageStore {
       throw checkTableExist;
     }
 
-    const tableExists = checkTableExist.rows[0].EXISTS;
+    const tableExists = checkTableExist.rows[0].exists;
 
     if (tableExists) {
       return;

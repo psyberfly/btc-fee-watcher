@@ -5,6 +5,7 @@ import { MovingAverageStore } from "./moving_average/pg";
 
 async function startServer() {
   try {
+    
     // Init table creation if not exist:
     const feeHistoryStore = new FeeHistoryStore();
     const movingAverageStore = new MovingAverageStore();

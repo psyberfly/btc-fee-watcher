@@ -1,7 +1,6 @@
 import { Client, QueryResult } from "pg";
 import * as fs from "fs";
 import * as dotenv from "dotenv";
-
 dotenv.config();
 
 export class PgStore {
@@ -27,22 +26,31 @@ export class PgStore {
     }
   }
 
-  public async copyCsvDataToTable(
-    filePath: string,
+  //Makeshift method:
+  public static async copyCsvDataToTable(
+    filePath: string, //filePath is relative to PG-DB's FS
     tableName: string,
   ): Promise<void> {
     try {
       // Read the CSV file
-      const csvData = fs.readFileSync(filePath, "utf8");
-
+      //const csvData = fs.readFileSync(filePath, "utf8");
+      console.log({ filePath });
       // Copy data from the CSV file into the PostgreSQL table
-      await PgStore.execQuery(
-        `
-        COPY ${tableName} FROM STDIN WITH CSV HEADER;
-      `,
-        [csvData],
+      const query = `
+      COPY ${tableName}
+      FROM '${filePath}'
+      DELIMITER ','
+      CSV HEADER;
+      `;
+      console.log(query);
+
+      const res = await PgStore.execQuery(
+        query,
       );
 
+      if (res instanceof Error) {
+        throw res;
+      }
       console.log(`CSV data copied into table ${tableName} successfully.`);
     } catch (error) {
       console.error("Error copying CSV data to table:", error);
