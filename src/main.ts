@@ -1,42 +1,16 @@
-import express, { Request, Response } from "express";
-import { FeeHistoryStore } from "./op/fee_history/pg";
-import { router as watcherRouter } from "./service/watcher/router";
-import { MovingAverageStore } from "./op/moving_average/pg";
+import { runServer } from "./infra/server";
+import { runIndexWatcher } from "./infra/index_watcher";
+import { initDB } from "./infra/db";
 
-async function startServer() {
+async function startService() {
   try {
-    
-    // Init table creation if not exist:
-    const feeHistoryStore = new FeeHistoryStore();
-    const movingAverageStore = new MovingAverageStore();
-    await feeHistoryStore.initTable();
-    await movingAverageStore.initTable();
-  
-    const app = express();
-
-    // Define a route
-    app.get("/", (req: Request, res: Response) => {
-      res.send("Hello from BTC Fee Watcher!");
-    });
-
-    app.use("/service", watcherRouter);
-
-    // Start the server
-    const port = process.env.PORT || 3000;
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-    });
+    await initDB();
+    await runServer();
+    await runIndexWatcher();
   } catch (error) {
-    console.error("Error starting server:", error);
-    // Handle the error appropriately (e.g., exit the process)
+    console.error(`Error running Service:${error}`);
     process.exit(1);
   }
 }
 
-startServer();
-
-
-async function runWatcher(){
-
-  
-  }
+startService();

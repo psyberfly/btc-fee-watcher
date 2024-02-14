@@ -26,7 +26,7 @@ nodejs, npm, postgres server
   update chart
 
   every block:
-  fetch fee rate 
+  fetch and update fee rate 
   calculate ratio of fee rate/moving averages
   update chart 
 

@@ -1,7 +1,7 @@
-import { PgStore } from "../../pg_store";
-import { MovingAverage } from "./interface";
+import { PgStore } from "../../infra/db";
+import { FeeEstMovingAverage } from "./interface";
 
-export class MovingAverageStore {
+export class IndexStore {
   
   private tableName = "moving_average";
 
@@ -41,7 +41,7 @@ export class MovingAverageStore {
     }
   }
 
-  async read(): Promise<MovingAverage | Error> {
+  async readLatestMovingAvg(): Promise<FeeEstMovingAverage | Error> {
     const query = `
     SELECT yearly, monthly
     FROM ${this.tableName};
@@ -52,7 +52,7 @@ export class MovingAverageStore {
       throw result;
     }
 
-    const movingAverage: MovingAverage = {
+    const movingAverage: FeeEstMovingAverage = {
       createdAt: new Date().toUTCString(),
       yearly: result.rows[0].yearly,
       monthly: result.rows[0].monthly,
@@ -61,7 +61,7 @@ export class MovingAverageStore {
     return movingAverage;
   }
 
-  async update(rowData: MovingAverage): Promise<boolean | Error> {
+  async update(rowData: FeeEstMovingAverage): Promise<boolean | Error> {
     const query = `
     UPDATE ${this.tableName}
     SET yearly = $1,

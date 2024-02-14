@@ -1,30 +1,53 @@
-import { Client, QueryResult } from "pg";
+import { Client, Pool, PoolClient, QueryResult } from "pg";
 import * as fs from "fs";
 import * as dotenv from "dotenv";
+import { handleError } from "../lib/errors/e";
+import { FeeHistoryStore } from "../op/fee_estimate/pg";
+import { IndexStore } from "../op/index/pg";
 dotenv.config();
+
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || "5432"),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+});
+
+export async function initDB() {
+  // Init table creation if not exist:
+  const feeHistoryStore = new FeeHistoryStore();
+  const movingAverageStore = new IndexStore();
+  await feeHistoryStore.initTable();
+  await movingAverageStore.initTable();
+}
+
 
 export class PgStore {
   public static async execQuery(
     query: string,
     values?: any[],
   ): Promise<QueryResult<any> | Error> {
+    const client = await pool.connect();
     try {
-      const client = new Client({
-        host: process.env.DB_HOST,
-        port: parseInt(process.env.DB_PORT || "5432"),
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_DATABASE,
-      });
-
-      await client.connect();
+      await client.query("BEGIN");
       const res = await client.query(query, values);
-      await client.end();
+      await client.query("COMMIT");
       return res;
     } catch (e) {
-      return e;
+      console.error("PgStore: Error executing query!");
+      await client.query("ROLLBACK");
+      return handleError(e);
+    } finally {
+      client.release();
     }
   }
+
+  
+  public static async disconnectDb(){
+    await pool.end();
+  }
+
 
   //Makeshift method:
   public static async copyCsvDataToTable(

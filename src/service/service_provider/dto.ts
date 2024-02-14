@@ -1,6 +1,6 @@
 import { filterError, parseRequest, respond } from "../lib/http/handler";
 import { r_500 } from "../lib/logger/winston";
-import { WatcherService } from "./watcher";
+import { WatcherService } from "./api_server";
 
 
 const watcherService = new WatcherService();
