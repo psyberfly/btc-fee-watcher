@@ -19,21 +19,21 @@ nodejs, npm, postgres server
 
 ## Spec:
 
-  OPs:
+**OPs:**
 
   every day:
-  calculate moving averages of 1. past 365 days, 2. past 30 days
-  update chart
+  1. calculate moving averages of 1. past 365 days, 2. past 30 days  
+  2. update chart  
 
   every block:
-  fetch and update fee rate 
-  calculate ratio of fee rate/moving averages
-  update chart 
+  1. fetch current fee rate   
+  2. calculate fee-avg ratio: currrent fee rate/moving averages  
+  3. update chart   
 
-  SERVICES:
+  **SERVICES:**
   
-  1. API providing latest latest fee ratio
-  2. WS providing subscription to latest fee ratio
+  1. API providing latest fee-avg ratio
+  2. WS providing subscription to latest fee-avg ratio
 
 ## To Do:
 currently last year's fee estimate history is loaded locally from file.
