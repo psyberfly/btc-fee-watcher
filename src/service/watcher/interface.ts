@@ -6,5 +6,7 @@ export interface FeeRatio {
 }
 
 export interface IWatcherService {
+  //watchFee(): P
   getFeeRatio(): Promise<FeeRatio | Error>;
+  
 }

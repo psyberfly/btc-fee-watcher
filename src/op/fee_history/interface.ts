@@ -7,4 +7,5 @@ export interface IFeeHistory {
   getLastYear(): Promise<FeeHistory[] | Error>;
   getLastMonth(): Promise<FeeHistory[] | Error>;
   getCurrent():Promise<FeeHistory | Error>;
+  updateLatest():Promise<boolean | Error>;
 }

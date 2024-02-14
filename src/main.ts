@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
-import { FeeHistoryStore } from "./fee_history/pg";
-import { router as watcherRouter } from "./watcher/router";
-import { MovingAverageStore } from "./moving_average/pg";
+import { FeeHistoryStore } from "./op/fee_history/pg";
+import { router as watcherRouter } from "./service/watcher/router";
+import { MovingAverageStore } from "./op/moving_average/pg";
 
 async function startServer() {
   try {
@@ -34,3 +34,9 @@ async function startServer() {
 }
 
 startServer();
+
+
+async function runWatcher(){
+
+  
+  }

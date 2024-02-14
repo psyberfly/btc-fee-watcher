@@ -1,5 +1,5 @@
-import { FeeHistoryService } from "../fee_history/fee_history";
-import { MovingAverageService } from "../moving_average/moving_average";
+import { FeeHistoryService } from "../../op/fee_history/fee_history";
+import { MovingAverageService } from "../../op/moving_average/moving_average";
 import { FeeRatio, IWatcherService } from "./interface";
 
 export class WatcherService implements IWatcherService {

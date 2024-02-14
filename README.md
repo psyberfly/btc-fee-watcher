@@ -17,6 +17,24 @@ nodejs, npm, postgres server
    tsc  
    npm start    
 
+## Spec:
+
+  OPs:
+
+  every day:
+  calculate moving averages of 1. past 365 days, 2. past 30 days
+  update chart
+
+  every block:
+  fetch fee rate 
+  calculate ratio of fee rate/moving averages
+  update chart 
+
+  SERVICES:
+  
+  1. API providing latest latest fee ratio
+  2. WS providing subscription to latest fee ratio
+
 ## To Do:
 currently last year's fee estimate history is loaded locally from file.
 

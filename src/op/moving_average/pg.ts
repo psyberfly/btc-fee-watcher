@@ -1,4 +1,4 @@
-import { PgStore } from "../pg_store";
+import { PgStore } from "../../pg_store";
 import { MovingAverage } from "./interface";
 
 export class MovingAverageStore {

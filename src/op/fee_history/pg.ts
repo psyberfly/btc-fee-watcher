@@ -1,5 +1,5 @@
 import { Client, QueryArrayConfig, QueryResult } from "pg";
-import { PgStore } from "../pg_store";
+import { PgStore } from "../../pg_store";
 import { FeeHistory } from "./interface";
 import * as dotenv from "dotenv";
 dotenv.config();

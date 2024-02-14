@@ -1,7 +1,7 @@
-import { fetchDate, UTCDate } from "../lib/date/date";
+import { fetchDate, UTCDate } from "../../lib/date/date";
 import { FeeHistory, IFeeHistory } from "./interface";
 import { FeeHistoryStore } from "./pg";
-
+import { makeApiCall } from "../../lib/network/network";
 export class FeeHistoryService implements IFeeHistory {
   private store = new FeeHistoryStore();
 
@@ -25,5 +25,17 @@ export class FeeHistoryService implements IFeeHistory {
 
     const res = await this.store.readByRange(lastMonth, today);
     return res;
+  }
+
+  async updateLatest(): Promise<boolean | Error> {
+    //fetch fee from mempool:
+    const mempoolApiUrl = "https://mempool.space/api/v1/fees/recommended";
+
+    const latestFee = await makeApiCall(mempoolApiUrl, "GET");
+    if (latestFee instanceof Error) {
+      return latestFee;
+    }
+
+    return latestFee["hourFee"];
   }
 }
