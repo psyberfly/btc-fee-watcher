@@ -52,7 +52,7 @@ export class FeeOp implements IFeeEstimateOp {
       id: null, //Added by DB,
     };
 
-    const isUpdated = await this.store.create(currentfeeEstimate);
+    const isUpdated = await this.store.insert(currentfeeEstimate);
 
     if (isUpdated instanceof Error) {
       return handleError(isUpdated);

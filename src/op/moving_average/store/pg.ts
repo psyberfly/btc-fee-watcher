@@ -6,12 +6,34 @@ export class MovingAverageStore {
   private tableName = "moving_average";
 
   async initTable(): Promise<void> {
+    const checkTableExistsQuery = `
+    SELECT EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_name = '${this.tableName}'
+    );
+`;
+
+    const checkTableExist = await PgStore.execQuery(checkTableExistsQuery);
+
+    if (checkTableExist instanceof Error) {
+      throw checkTableExist;
+    }
+
+    const tableExists = checkTableExist.rows[0].exists;
+
+    if (tableExists) {
+      return;
+    }
+
+    console.log(`Table ${this.tableName} not found. Creating...`);
+
     const query = `
                 CREATE TABLE IF NOT EXISTS ${this.tableName} (
                   id SERIAL PRIMARY KEY,
-                  last365Days NUMERIC,
-                  last30Days NUMERIC,
-                  createdAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP  
+                  last_365_days NUMERIC,
+                  last_30_days NUMERIC,
+                  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP  
                   );
               `;
     const res = await PgStore.execQuery(query);
@@ -34,9 +56,9 @@ export class MovingAverageStore {
 
     const movingAverage: FeeEstMovingAverage = {
       id: result.rows[0]["id"],
-      createdAt: result.rows[0]["createdAt"],
-      last365Days: result.rows[0]["last365Days"],
-      last30Days: result.rows[0]["monthly"],
+      createdAt: result.rows[0]["created_at"],
+      last365Days: result.rows[0]["last_365_days"],
+      last30Days: result.rows[0]["last_30_days"],
     };
 
     return movingAverage;
@@ -44,7 +66,7 @@ export class MovingAverageStore {
 
   async insert(movingAverage: FeeEstMovingAverage): Promise<boolean | Error> {
     const query = `
-       INSERT INTO ${this.tableName} (last365Days, last30Days) 
+       INSERT INTO ${this.tableName} (last_365_days, last_30_days) 
        VALUES (${movingAverage.last365Days}, ${movingAverage.last30Days});
 
     `;

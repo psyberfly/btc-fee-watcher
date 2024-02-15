@@ -46,15 +46,15 @@ export class FeeEstStore {
 
     //load data:
 
-    const csvFilePath = process.env.FEE_HISTORY_FILE_PATH;
-    await PgStore.copyCsvDataToTable(csvFilePath, this.tableName).catch((
-      error,
-    ) => console.error("Error:", error));
+    //   const csvFilePath = process.env.FEE_HISTORY_FILE_PATH;
+    //   await PgStore.copyCsvDataToTable(csvFilePath, this.tableName).catch((
+    //     error,
+    //   ) => console.error("Error:", error));
   }
 
-  async create(rowData: FeeEstimate): Promise<boolean | Error> {
+  async insert(rowData: FeeEstimate): Promise<boolean | Error> {
     const query =
-      `INSERT INTO ${this.tableName} (time, statsPerByte) VALUES ($1, $2)`;
+      `INSERT INTO ${this.tableName} (time, stats_per_byte) VALUES ($1, $2)`;
     const result = await PgStore.execQuery(query, [
       rowData.time,
       rowData.satsPerByte,
@@ -97,7 +97,7 @@ export class FeeEstStore {
     const feeEstimate: FeeEstimate = {
       id: result.rows[0]["id"],
       time: result.rows[0]["time"],
-      satsPerByte: result.rows[0]["satsPerByte"],
+      satsPerByte: result.rows[0]["sats_per_byte"],
     };
 
     return feeEstimate;

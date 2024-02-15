@@ -10,20 +10,42 @@ export class IndexStore {
   private tableNameMovingAverage = "moving_average";
 
   async initTable(): Promise<void> {
+    const checkTableExistsQuery = `
+    SELECT EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_name = '${this.tableName}'
+    );
+`;
+
+    const checkTableExist = await PgStore.execQuery(checkTableExistsQuery);
+
+    if (checkTableExist instanceof Error) {
+      throw checkTableExist;
+    }
+
+    const tableExists = checkTableExist.rows[0].exists;
+
+    if (tableExists) {
+      return;
+    }
+
+    console.log(`Table ${this.tableName} not found. Creating...`);
+
     const query = `
                 CREATE TABLE IF NOT EXISTS ${this.tableName} (
                   id SERIAL PRIMARY KEY,
-                  feeEstimateId NUMERIC REFERENCES fee_estimate(id),
-                  movingAverageId NUMERIC REFERENCES moving_average(id),
-                  ratioLast365Days NUMERIC
-                  ratioLast30Days NUMERIC
-                  createdAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP  
+                  fee_estimate_id SERIAL REFERENCES fee_estimate(id),
+                  moving_average_id SERIAL REFERENCES moving_average(id),
+                  ratio_last_365_days NUMERIC,
+                  ratio_last_30_days NUMERIC,
+                  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP  
                   );
               `;
     const res = await PgStore.execQuery(query);
 
     if (res instanceof Error) {
-      throw res;
+      handleError(res);
     }
   }
 
@@ -32,12 +54,12 @@ export class IndexStore {
     const query = `
     SELECT ${this.tableName}.*, ${this.tableNameFeeEst}.*, ${this.tableNameMovingAverage}.*
     FROM ${this.tableName}
-    INNER JOIN ${this.tableNameFeeEst} ON ${this.tableName}.feeEstimateId = ${this.tableNameFeeEst}.id
-    INNER JOIN ${this.tableNameMovingAverage} ON ${this.tableName}.movingAverageId = ${this.tableNameMovingAverage}.id
+    INNER JOIN ${this.tableNameFeeEst} ON ${this.tableName}.fee_estimate_id = ${this.tableNameFeeEst}.id
+    INNER JOIN ${this.tableNameMovingAverage} ON ${this.tableName}.moving_average_id = ${this.tableNameMovingAverage}.id
     WHERE ${this.tableName}.id = (
         SELECT id
         FROM ${this.tableName}
-        ORDER BY createdAt DESC
+        ORDER BY created_at DESC
         LIMIT 1
     );
     
@@ -51,22 +73,22 @@ export class IndexStore {
     const feeEst: FeeEstimate = {
       id: result[0]["id"],
       time: result[0]["time"],
-      satsPerByte: result[0]["satsPerByte"],
+      satsPerByte: result[0]["sats_per_byte"],
     };
 
     const movingAverage: FeeEstMovingAverage = {
       id: result[0]["id"],
-      createdAt: result[0]["createdAt"],
-      last365Days: result[0]["last365Days"],
-      last30Days: result[0]["last30Days"],
+      createdAt: result[0]["created_at"],
+      last365Days: result[0]["last_365_days"],
+      last30Days: result[0]["last_30_days"],
     };
 
     const index: Index = {
       feeEstimate: feeEst,
       movingAverage: movingAverage,
-      ratioLast365Days: result[0]["ratioLast365Days"],
-      ratioLast30Days: result[0]["ratioLast30Days"],
-      createdAt: result[0]["createdAt"],
+      ratioLast365Days: result[0]["ratio_last_365_days"],
+      ratioLast30Days: result[0]["ratio_last_30_days"],
+      createdAt: result[0]["created_at"],
     };
 
     return index;
@@ -74,7 +96,7 @@ export class IndexStore {
 
   async insert(index: Index): Promise<boolean | Error> {
     const query = `
-       INSERT INTO ${this.tableName} (feeEstimateId, movingAverageId, ratioLast365Days, ratioLast30Days) 
+       INSERT INTO ${this.tableName} (fee_estimate_id, moving_average_id, ratio_last_365_days, ratio_last_30_days) 
        VALUES (${index.feeEstimate.id}, ${index.movingAverage.id}, ${index.ratioLast365Days},${index.ratioLast30Days});
 
     `;

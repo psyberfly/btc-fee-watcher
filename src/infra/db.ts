@@ -39,6 +39,7 @@ export class PgStore {
       return res;
     } catch (e) {
       console.error("PgStore: Error executing query!");
+      console.error(e);
       await client.query("ROLLBACK");
       return handleError(e);
     } finally {
