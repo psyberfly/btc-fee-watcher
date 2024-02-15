@@ -34,7 +34,7 @@ export class FeeOp implements IFeeEstimateOp {
 
     if (res instanceof Error) {
       console.error("Error fetching fee estimate from API!");
-      handleError(res);
+      return handleError(res);
     }
 
     const satsPerByte = res["fastestFee"];

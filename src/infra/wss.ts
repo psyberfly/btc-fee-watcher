@@ -51,7 +51,7 @@ export class AlertStreamServer {
     }
   }
 
-  public broadcastAlert(data: Index): boolean {
+  public broadcastAlert(data: Index): boolean | Error {
     try {
       // Broadcast to all connected clients
       AlertStreamServer.alertStreamServer.clients.forEach((client) => {
@@ -59,7 +59,7 @@ export class AlertStreamServer {
       });
     } catch (e) {
       console.error("AlertStreamServer: Error during broadcast!");
-      handleError(e);
+      return handleError(e);
     }
 
     return true;

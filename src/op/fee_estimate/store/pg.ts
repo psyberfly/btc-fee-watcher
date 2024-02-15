@@ -2,6 +2,7 @@ import { Client, QueryArrayConfig, QueryResult } from "pg";
 import { PgStore } from "../../../infra/db";
 import { FeeEstimate } from "../interface";
 import * as dotenv from "dotenv";
+import { handleError } from "../../../lib/errors/e";
 dotenv.config();
 
 export class FeeEstStore {
@@ -41,7 +42,7 @@ export class FeeEstStore {
     const res = await PgStore.execQuery(createQuery);
 
     if (res instanceof Error) {
-      throw res;
+      handleError(res);
     }
 
     //load data:
@@ -54,13 +55,13 @@ export class FeeEstStore {
 
   async insert(rowData: FeeEstimate): Promise<boolean | Error> {
     const query =
-      `INSERT INTO ${this.tableName} (time, stats_per_byte) VALUES ($1, $2)`;
+      `INSERT INTO ${this.tableName} (time, sats_per_byte) VALUES ($1, $2)`;
     const result = await PgStore.execQuery(query, [
       rowData.time,
       rowData.satsPerByte,
     ]);
     if (result instanceof Error) {
-      throw result;
+      return handleError(result);
     }
     return true;
   }
@@ -73,7 +74,7 @@ export class FeeEstStore {
       `SELECT * FROM ${this.tableName} WHERE time >= $1 AND time <= $2`;
     const result = await PgStore.execQuery(query, [fromDate, toDate]);
     if (result instanceof Error) {
-      throw result;
+      return handleError(result);
     }
     const feeEstHistory: FeeEstimate[] = result.rows.map((row: any) => ({
       id: row["id"],
@@ -86,13 +87,13 @@ export class FeeEstStore {
   async readLatest(): Promise<FeeEstimate | Error> {
     const query = `
     SELECT *
-    FROM fee_history
+    FROM ${this.tableName}
     ORDER BY time DESC
     LIMIT 1;
 `;
     const result = await PgStore.execQuery(query);
     if (result instanceof Error) {
-      throw result;
+      return handleError(result);
     }
     const feeEstimate: FeeEstimate = {
       id: result.rows[0]["id"],
