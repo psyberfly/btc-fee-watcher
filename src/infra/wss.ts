@@ -1,5 +1,5 @@
 import express from "express";
-import { WebSocketServer } from "ws";
+import { Server as WebSocketServer } from "ws";
 import { TEN_MINUTES_MS } from "../lib/time/time";
 import { Index } from "../op/index/interface";
 import { alertStreamPath } from "../service/service_provider/router";
