@@ -2,7 +2,7 @@ import { Client, Pool, PoolClient, QueryResult } from "pg";
 import * as fs from "fs";
 import * as dotenv from "dotenv";
 import { handleError } from "../lib/errors/e";
-import { FeeHistoryStore } from "../op/fee_estimate/pg";
+import { FeeEstStore } from "../op/fee_estimate/pg";
 import { IndexStore } from "../op/index/pg";
 dotenv.config();
 
@@ -16,7 +16,7 @@ const pool = new Pool({
 
 export async function initDB() {
   // Init table creation if not exist:
-  const feeHistoryStore = new FeeHistoryStore();
+  const feeHistoryStore = new FeeEstStore();
   const movingAverageStore = new IndexStore();
   await feeHistoryStore.initTable();
   await movingAverageStore.initTable();

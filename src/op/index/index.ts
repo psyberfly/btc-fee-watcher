@@ -1,86 +1,57 @@
+import { handleError } from "../../lib/errors/e";
 import { FeeOp } from "../fee_estimate/fee_estimate";
 import { FeeEstimate } from "../fee_estimate/interface";
-import { IIndexWatcher, FeeEstMovingAverage, Index } from "./interface";
+import { FeeEstStore } from "../fee_estimate/pg";
+import { MovingAverageStore } from "../moving_average/pg";
+import { IIndexOp, Index } from "./interface";
 import { IndexStore } from "./pg";
 
-export class IndexerWatcher implements IIndexWatcher {
+export class IndexOp implements IIndexOp {
+  updateIndex(currentFee: FeeEstimate): Promise<boolean | Error> {
+    throw new Error("Method not implemented.");
+  }
   private feeOp = new FeeOp();
   private store = new IndexStore();
+  private feeEstStore = new FeeEstStore();
+  private movingAvgStore = new MovingAverageStore();
 
-  readLatest(): Promise<Error | FeeEstMovingAverage> {
-    const res = this.store.read();
-    return res;
-  }
-  async updateFeeEstMovingAverages(): Promise<boolean | Error> {
-    try {
-      const feeHistoryLastYear = await this.feeOp.readLast365Days();
-
-      if (feeHistoryLastYear instanceof Error) {
-        return feeHistoryLastYear;
-      }
-      if (feeHistoryLastYear.length === 0) {
-        throw new Error("Array is empty, cannot calculate average.");
-      }
-
-      const yearlySum = feeHistoryLastYear.reduce(
-        (acc, curr) => acc + curr.satsPerByte.valueOf(),
-        0,
-      );
-
-      const yearlyAverage = yearlySum / feeHistoryLastYear.length;
-
-      const feeHistoryLastMonth = await this.feeOp.readLast30Days();
-
-      if (feeHistoryLastMonth instanceof Error) {
-        return feeHistoryLastMonth;
-      }
-      if (feeHistoryLastMonth.length === 0) {
-        throw new Error("Array is empty, cannot calculate average.");
-      }
-
-      const monthlySum = feeHistoryLastMonth.reduce(
-        (acc, curr) => acc + curr.satsPerByte.valueOf(),
-        0,
-      );
-
-      const monthlyAverage = monthlySum / feeHistoryLastYear.length;
-
-      const update: FeeEstMovingAverage = {
-        createdAt: new Date().toUTCString(),
-        last365Days: yearlyAverage,
-        last30Days: monthlyAverage,
-      };
-
-      this.store.update(update);
-    } catch (e) {
-      throw e;
+  async readLatest(): Promise<Error | Index> {
+    const index = await this.store.readLatest();
+    if (index instanceof Error) {
+      return handleError(index);
     }
+
+    return index;
   }
 
-  async udpateIndex(currentFeeEst: FeeEstimate): Promise<Index | Error> {
-    //fetch curent btc fee from db?
-    const currentFeeRate = currentFee.satsPerByte;
+  async udpateIndex(): Promise<boolean | Error> {
+    const currentFeeEst = await this.feeEstStore.readLatest();
 
-    const today = new Date().toUTCString;
+    if (currentFeeEst instanceof Error) {
+      return handleError(currentFeeEst);
+    }
 
-    const movingAvgToday = await this.store.readMovingAvgByDate(today);
+    const movingAvgToday = await this.movingAvgStore.readLatest();
 
     if (movingAvgToday instanceof Error) {
-      throw movingAvgToday;
+      return handleError(movingAvgToday);
     }
 
-    const ratioFeeToYearlyAvg = currentFeeRate / movingAvgToday.last365Days;
+    const ratioLast365Days = currentFeeEst.satsPerByte /
+      movingAvgToday.last365Days;
 
-    const ratioFeeToMonthlyAvg = currentFeeRate / movingAvgToday.last30Days;
+    const ratioLast30Days = currentFeeEst.satsPerByte /
+      movingAvgToday.last30Days;
 
-    const feeAvgRatio: CurrAvgFeeEstRatio = {
-      
-      fee: currentFee,
+    const index: Index = {
+      feeEstimate: currentFeeEst,
       movingAverage: movingAvgToday,
-      currToAvgYrlyRatio: ratioFeeToYearlyAvg,
-      currToAvgMnthlyRatio: ratioFeeToMonthlyAvg,
+      ratioLast365Days: ratioLast365Days,
+      ratioLast30Days: ratioLast30Days,
+      createdAt: null, //added by DB
     };
 
-    this.store.updateFeeAvgRatio(feeRatio);
+    this.store.insert(index);
+    return true;
   }
 }

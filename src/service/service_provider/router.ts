@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { handleGetFeeRatio } from "./dto";
+import { handleGetIndex } from "./dto";
 export const router = Router();
 
 export const alertStreamPath = "/streamFeeRatio";
 
-router.get("/feeRatio", handleGetFeeRatio);
+router.get("/index", handleGetIndex);

@@ -1,4 +1,6 @@
+import { Index } from "../../op/index/interface";
+
 export interface IServiceProvider {
-  getFeeRatio(): Promise<FeeAvgRatio | Error>;    
+  getIndex(): Promise<Index | Error>;    
     
 }

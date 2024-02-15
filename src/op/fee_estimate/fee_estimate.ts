@@ -1,11 +1,11 @@
 import { fetchDate, UTCDate } from "../../lib/date/date";
 import { FeeEstimate, IFeeEstimateOp } from "./interface";
-import { FeeHistoryStore } from "./pg";
+import { FeeEstStore } from "./pg";
 import { makeApiCall } from "../../lib/network/network";
 import { handleError } from "../../lib/errors/e";
 export class FeeOp implements IFeeEstimateOp {
   private mempoolApiUrl = "https://mempool.space/api/v1/fees/recommended";
-  private store = new FeeHistoryStore();
+  private store = new FeeEstStore();
 
   async readLatest(): Promise<FeeEstimate | Error> {
     const res = await this.store.readLatest();
@@ -29,7 +29,7 @@ export class FeeOp implements IFeeEstimateOp {
     return res;
   }
 
-  async fetchUpdateCurrent(): Promise<FeeEstimate | Error> {
+  async updateCurrent(): Promise<boolean | Error> {
     const res = await makeApiCall(this.mempoolApiUrl, "GET");
 
     if (res instanceof Error) {
@@ -49,10 +49,14 @@ export class FeeOp implements IFeeEstimateOp {
     const currentfeeEstimate: FeeEstimate = {
       time: new Date().toUTCString(),
       satsPerByte: satsPerByte,
+      id: null, //Added by DB,
     };
 
-    this.store.create(currentfeeEstimate);
+    const isUpdated = await this.store.create(currentfeeEstimate);
 
-    return currentfeeEstimate;
+    if (isUpdated instanceof Error) {
+      return handleError(isUpdated);
+    }
+    return true;
   }
 }

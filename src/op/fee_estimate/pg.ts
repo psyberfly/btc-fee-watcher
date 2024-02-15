@@ -4,8 +4,8 @@ import { FeeEstimate } from "./interface";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-export class FeeHistoryStore {
-  private tableName = "fee_history";
+export class FeeEstStore {
+  private tableName = "fee_estimate";
 
   async initTable(): Promise<void> {
     const checkTableExistsQuery = `
@@ -32,6 +32,7 @@ export class FeeHistoryStore {
 
     const createQuery = `
         CREATE TABLE IF NOT EXISTS ${this.tableName} (
+          id SERIAL PRIMARY KEY,
           time TIMESTAMP WITH TIME ZONE,
           sats_per_byte NUMERIC
         );
@@ -74,11 +75,12 @@ export class FeeHistoryStore {
     if (result instanceof Error) {
       throw result;
     }
-    const feeHistory: FeeEstimate[] = result.rows.map((row: any) => ({
-      time: row.time,
-      satsPerByte: row.sats_per_byte,
+    const feeEstHistory: FeeEstimate[] = result.rows.map((row: any) => ({
+      id: row["id"],
+      time: row["time"],
+      satsPerByte: row["sats_per_byte"],
     }));
-    return feeHistory;
+    return feeEstHistory;
   }
 
   async readLatest(): Promise<FeeEstimate | Error> {
@@ -92,7 +94,12 @@ export class FeeHistoryStore {
     if (result instanceof Error) {
       throw result;
     }
-    const feeHistory: FeeEstimate = result.rows[0];
-    return feeHistory;
+    const feeEstimate: FeeEstimate = {
+      id: result.rows[0]["id"],
+      time: result.rows[0]["time"],
+      satsPerByte: result.rows[0]["satsPerByte"],
+    };
+
+    return feeEstimate;
   }
 }

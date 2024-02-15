@@ -21,11 +21,11 @@ nodejs, npm, postgres server
 
 **OPs:**
 
-  every day:
+  Do every day:
   1. calculate moving averages of 1. past 365 days, 2. past 30 days  
   2. update chart  
 
-  every block:
+  Do every block:
   1. fetch current fee rate   
   2. calculate fee-avg ratio: currrent fee rate/moving averages  
   3. update chart   
@@ -36,10 +36,5 @@ nodejs, npm, postgres server
   2. WS providing subscription to latest fee-avg ratio
 
 ## To Do:
-currently last year's fee estimate history is loaded locally from file.
-
-since fee ratio needs to be charted, we have to store the feeRatio at each block genesis.
-So, movingAverages table can have a new column:feeRatio can be columns in same table updated at each new block.
-When user queries API, return latest feeRatio instead of calculating. 
-
-write a cron job to update the moving average at every block/every 6 hours 
+1. currently last year's fee estimate history is loaded locally from csv file. CSV File is loaded by host via psql. Write an init procedure in server to load it. 
+2. Test DB, API, WS

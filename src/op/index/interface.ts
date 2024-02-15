@@ -1,24 +1,18 @@
 import { FeeEstimate } from "../fee_estimate/interface";
+import { FeeEstMovingAverage } from "../moving_average/interface";
 
 //INDEX
-export interface FeeEstMovingAverage {
-    createdAt: String;
-    last365Days: number;
-    last30Days: number;
-  }
-  
-  //ratio = currentFeeEst/feeEstMovingAvg
-  export interface Index {
-    currentFeeEst: FeeEstimate;
-    movingAverage: FeeEstMovingAverage;
-    ratioYearly: number;
-    ratioMonthly: number;
-  }
-  
-  export interface IIndexWatcher {
-    //invoked daily
-    updateMovingAverages(): Promise<boolean | Error>;
-    //invoked every 10 min (block)
-    updateFeeAvgRatio(currentFee: FeeEstimate): Promise<boolean | Error>;
-  }
-  
+//ratio = currentFeeEst/feeEstMovingAvg
+export interface Index {
+  feeEstimate: FeeEstimate;
+  movingAverage: FeeEstMovingAverage;
+  ratioLast365Days: number;
+  ratioLast30Days: number;
+  createdAt: string;
+}
+
+export interface IIndexOp {
+  //invoked every 10 min (block)
+  updateIndex(currentFee: FeeEstimate): Promise<boolean | Error>;
+  readLatest(): Promise<Index | Error>;
+}
