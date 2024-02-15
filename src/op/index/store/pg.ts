@@ -50,8 +50,9 @@ export class IndexStore {
   }
 
   async readLatest(): Promise<Index | Error> {
-    //moving avg and index tables both have createdAt and id. Update query to disambiguate the two!!
-    const query = `
+    try {
+      //moving avg and index tables both have createdAt and id. Update query to disambiguate the two!!
+      const query = `
     SELECT ${this.tableName}.*, ${this.tableNameFeeEst}.*, ${this.tableNameMovingAverage}.*
     FROM ${this.tableName}
     INNER JOIN ${this.tableNameFeeEst} ON ${this.tableName}.fee_estimate_id = ${this.tableNameFeeEst}.id
@@ -64,34 +65,37 @@ export class IndexStore {
     );
     
     `;
-    const result = await PgStore.execQuery(query);
+      const result = await PgStore.execQuery(query);
 
-    if (result instanceof Error) {
-      return handleError(result);
+      if (result instanceof Error) {
+        return handleError(result);
+      }
+
+      const feeEst: FeeEstimate = {
+        id: result[0]["id"],
+        time: result[0]["time"],
+        satsPerByte: result[0]["sats_per_byte"],
+      };
+
+      const movingAverage: FeeEstMovingAverage = {
+        id: result[0]["id"],
+        createdAt: result[0]["created_at"],
+        last365Days: result[0]["last_365_days"],
+        last30Days: result[0]["last_30_days"],
+      };
+
+      const index: Index = {
+        feeEstimate: feeEst,
+        movingAverage: movingAverage,
+        ratioLast365Days: result[0]["ratio_last_365_days"],
+        ratioLast30Days: result[0]["ratio_last_30_days"],
+        createdAt: result[0]["created_at"],
+      };
+
+      return index;
+    } catch (e) {
+      return handleError(e);
     }
-
-    const feeEst: FeeEstimate = {
-      id: result[0]["id"],
-      time: result[0]["time"],
-      satsPerByte: result[0]["sats_per_byte"],
-    };
-
-    const movingAverage: FeeEstMovingAverage = {
-      id: result[0]["id"],
-      createdAt: result[0]["created_at"],
-      last365Days: result[0]["last_365_days"],
-      last30Days: result[0]["last_30_days"],
-    };
-
-    const index: Index = {
-      feeEstimate: feeEst,
-      movingAverage: movingAverage,
-      ratioLast365Days: result[0]["ratio_last_365_days"],
-      ratioLast30Days: result[0]["ratio_last_30_days"],
-      createdAt: result[0]["created_at"],
-    };
-
-    return index;
   }
 
   async insert(index: Index): Promise<boolean | Error> {
