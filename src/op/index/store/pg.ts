@@ -1,8 +1,8 @@
-import { PgStore } from "../../infra/db";
-import { handleError } from "../../lib/errors/e";
-import { FeeEstimate } from "../fee_estimate/interface";
-import { FeeEstMovingAverage } from "../moving_average/interface";
-import { Index } from "./interface";
+import { PgStore } from "../../../infra/db";
+import { handleError } from "../../../lib/errors/e";
+import { FeeEstimate } from "../../fee_estimate/interface";
+import { FeeEstMovingAverage } from "../../moving_average/interface";
+import { Index } from "../interface";
 
 export class IndexStore {
   private tableName = "fee_index";

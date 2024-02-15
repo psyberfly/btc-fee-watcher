@@ -2,8 +2,9 @@ import { Client, Pool, PoolClient, QueryResult } from "pg";
 import * as fs from "fs";
 import * as dotenv from "dotenv";
 import { handleError } from "../lib/errors/e";
-import { FeeEstStore } from "../op/fee_estimate/pg";
-import { IndexStore } from "../op/index/pg";
+import { FeeEstStore } from "../op/fee_estimate/store/pg";
+import { IndexStore } from "../op/index/store/pg";
+import { MovingAverageStore } from "../op/moving_average/store/pg";
 dotenv.config();
 
 const pool = new Pool({
@@ -17,11 +18,13 @@ const pool = new Pool({
 export async function initDB() {
   // Init table creation if not exist:
   const feeHistoryStore = new FeeEstStore();
-  const movingAverageStore = new IndexStore();
+  const movingAverageStore = new MovingAverageStore();
+  const indexStore = new IndexStore();
+
   await feeHistoryStore.initTable();
   await movingAverageStore.initTable();
+  await indexStore.initTable();
 }
-
 
 export class PgStore {
   public static async execQuery(
@@ -43,11 +46,9 @@ export class PgStore {
     }
   }
 
-  
-  public static async disconnectDb(){
+  public static async disconnectDb() {
     await pool.end();
   }
-
 
   //Makeshift method:
   public static async copyCsvDataToTable(

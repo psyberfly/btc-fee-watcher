@@ -1,6 +1,6 @@
 import { fetchDate, UTCDate } from "../../lib/date/date";
 import { FeeEstimate, IFeeEstimateOp } from "./interface";
-import { FeeEstStore } from "./pg";
+import { FeeEstStore } from "./store/pg";
 import { makeApiCall } from "../../lib/network/network";
 import { handleError } from "../../lib/errors/e";
 export class FeeOp implements IFeeEstimateOp {

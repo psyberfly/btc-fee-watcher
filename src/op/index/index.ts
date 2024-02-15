@@ -1,10 +1,10 @@
 import { handleError } from "../../lib/errors/e";
 import { FeeOp } from "../fee_estimate/fee_estimate";
 import { FeeEstimate } from "../fee_estimate/interface";
-import { FeeEstStore } from "../fee_estimate/pg";
-import { MovingAverageStore } from "../moving_average/pg";
+import { FeeEstStore } from "../fee_estimate/store/pg";
+import { MovingAverageStore } from "../moving_average/store/pg";
 import { IIndexOp, Index } from "./interface";
-import { IndexStore } from "./pg";
+import { IndexStore } from "./store/pg";
 
 export class IndexOp implements IIndexOp {
   updateIndex(currentFee: FeeEstimate): Promise<boolean | Error> {

@@ -1,6 +1,6 @@
 import { Client, QueryArrayConfig, QueryResult } from "pg";
-import { PgStore } from "../../infra/db";
-import { FeeEstimate } from "./interface";
+import { PgStore } from "../../../infra/db";
+import { FeeEstimate } from "../interface";
 import * as dotenv from "dotenv";
 dotenv.config();
 

@@ -1,6 +1,6 @@
 import { runServer } from "./infra/server";
 import { runIndexWatcher } from "./infra/index_watcher";
-import { initDB } from "./infra/db";
+import { initDB, PgStore } from "./infra/db";
 
 async function startService() {
   try {
@@ -10,6 +10,9 @@ async function startService() {
   } catch (error) {
     console.error(`Error running Service:${error}`);
     process.exit(1);
+  } finally {
+    //Graceful shutdown:
+    await PgStore.disconnectDb();
   }
 }
 

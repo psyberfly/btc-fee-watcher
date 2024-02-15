@@ -20,8 +20,5 @@ export async function runServer() {
   } catch (error) {
     console.error("Error starting server:", error);
     process.exit(1);
-  } finally {
-    //Graceful shutdown:
-    await PgStore.disconnectDb();
-  }
+  } 
 }
