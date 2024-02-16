@@ -7,7 +7,9 @@ The index is available via API & Websocket and provides 2 ratios:
    2. Current fee estimate / last 30 days moving average of fee estimates
            
 If index (ratios) < 1, current fee is low, else high.  
-The index is updated every 10 mins (~block) and moving averages every day.    
+The index is updated every 10 mins (~block) and moving averages every day.  
+Fee estimates from [mempool_recommended_fee_api](https://mempool.space/docs/api/rest#get-recommended-fees)  
+Fee estimate history from [txsats api_specific_fee_estimate](https://txstats.com/d/000000011/fee-estimation?orgId=1&viewPanel=2&var-source=mempool.space)  
 
 ## Prerequisites:
 nodejs, npm, postgres server
