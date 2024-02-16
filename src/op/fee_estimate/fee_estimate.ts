@@ -1,12 +1,15 @@
 import { fetchDate, UTCDate } from "../../lib/date/date";
-import { FeeEstimate, IFeeEstimateOp } from "./interface";
-import { FeeEstStore } from "./store/pg";
+import { IFeeEstimateOp } from "./interface";
+// import { FeeEstPgStore } from "./store/pg";
 import { makeApiCall } from "../../lib/network/network";
 import { handleError } from "../../lib/errors/e";
+import { FeeEstimatePrismaStore } from "./store/prisma";
+import { FeeEstimate } from "@prisma/client";
 export class FeeOp implements IFeeEstimateOp {
   private mempoolApiUrl = "https://mempool.space/api/v1/fees/recommended";
-  private store = new FeeEstStore();
-
+  // private store = new FeeEstPgStore();
+  private store = new FeeEstimatePrismaStore();
+  
   async readLatest(): Promise<FeeEstimate | Error> {
     const res = await this.store.readLatest();
     return res;
@@ -47,7 +50,7 @@ export class FeeOp implements IFeeEstimateOp {
     }
 
     const currentfeeEstimate: FeeEstimate = {
-      time: new Date().toUTCString(),
+      time: new Date(),
       satsPerByte: satsPerByte,
       id: null, //Added by DB,
     };

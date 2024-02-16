@@ -1,11 +1,11 @@
 import express from "express";
 import { Server as WebSocketServer } from "ws";
 import { TEN_MINUTES_MS } from "../lib/time/time";
-import { Index } from "../op/index/interface";
 import { alertStreamPath } from "../service/service_provider/router";
 import http from "http";
 import * as dotenv from "dotenv";
 import { handleError } from "../lib/errors/e";
+import { FeeIndex } from "@prisma/client";
 dotenv.config();
 
 export class AlertStreamServer {
@@ -49,7 +49,7 @@ export class AlertStreamServer {
     }
   }
 
-  public broadcastAlert(data: Index): boolean | Error {
+  public broadcastAlert(data: FeeIndex): boolean | Error {
     try {
       // Broadcast to all connected clients
       AlertStreamServer.alertStreamServer.clients.forEach((client) => {

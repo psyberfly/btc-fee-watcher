@@ -1,15 +1,18 @@
 import { query } from "express";
-import { PgStore } from "../../infra/db";
-import { FeeEstMovingAverage, IMovingAverageOp } from "./interface";
+//import { PgStore } from "../../infra/db";
+import { IMovingAverageOp } from "./interface";
 import { FeeOp } from "../fee_estimate/fee_estimate";
-import { MovingAverageStore } from "./store/pg";
+//import { MovingAverageStore } from "./store/pg";
 import { handleError } from "../../lib/errors/e";
+import { MovingAverage } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
+import { MovingAveragePrismaStore } from "./store/prisma";
 
 export class MovingAverageOp implements IMovingAverageOp {
   private feeOp = new FeeOp();
-  private store = new MovingAverageStore();
+  private store = new MovingAveragePrismaStore();
 
-  async readLatest(): Promise<Error | FeeEstMovingAverage> {
+  async readLatest(): Promise<Error | MovingAverage> {
     const latestMovingAvg = await this.store.readLatest();
     if (latestMovingAvg instanceof Error) {
       return handleError(latestMovingAvg);
@@ -39,7 +42,7 @@ export class MovingAverageOp implements IMovingAverageOp {
       }
 
       const yearlySum = feeHistoryLastYear.reduce(
-        (acc, curr) => acc + curr.satsPerByte.valueOf(),
+        (acc, curr) => acc + curr.satsPerByte.toNumber(),
         0,
       );
 
@@ -57,17 +60,17 @@ export class MovingAverageOp implements IMovingAverageOp {
       }
 
       const monthlySum = feeHistoryLastMonth.reduce(
-        (acc, curr) => acc + curr.satsPerByte.valueOf(),
+        (acc, curr) => acc + curr.satsPerByte.toNumber(),
         0,
       );
 
       const monthlyAverage = monthlySum / feeHistoryLastYear.length;
 
-      const update: FeeEstMovingAverage = {
+      const update: MovingAverage = {
         id: null, //Added by DB
         createdAt: null, //Added by DB
-        last365Days: yearlyAverage,
-        last30Days: monthlyAverage,
+        last365Days: new Decimal(yearlyAverage),
+        last30Days: new Decimal(monthlyAverage),
       };
 
       this.store.insert(update);

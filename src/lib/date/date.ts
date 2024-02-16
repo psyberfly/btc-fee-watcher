@@ -4,7 +4,7 @@ export enum UTCDate {
   lastYear,
 }
 
-export function fetchDate(reqDate: UTCDate): String {
+export function fetchDate(reqDate: UTCDate): string {
   const today = new Date();
   switch (reqDate) {
     case UTCDate.today:

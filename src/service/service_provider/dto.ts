@@ -5,7 +5,7 @@ import { ServiceProvider } from "./service_provider";
 const watcherService = new ServiceProvider();
 
 export async function handleGetIndex(req, res) {
-  console.log("handling....");
+  console.log("Handling req....");
   const request = parseRequest(req);
   try {
     let response = await watcherService.getIndex();
