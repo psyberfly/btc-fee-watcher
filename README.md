@@ -1,12 +1,13 @@
 # BTC Fee Estimate Watcher &emsp;&emsp; )))<!>.<!>(((
 
 ## About:
-A service to provide alerts via API and WS when btc fee estimate is low.
-2 Fee Ratio are caluclated:
-1. Current Fee Estimate / yearly moving average 
-2. Current Fee Estimate / monthly moving average 
-If fee ratio > 1, fee is high, else low.
-Fee Est : Moving Avg ratio is updated every 10 mins (~block).
+A service to provide an index indicating if current btc fee estimate is low or not (compared to last year and last month). This index is useful to alert customers to avail low fee rates for txs, utxo consolidation, etc.  
+The index is available via API & Websocket and provides 2 ratios: 
+   1. Current fee estimate / last 365 days moving average of fee estimates    
+   2. Current fee estimate / last 30 days moving average of fee estimates
+           
+If index (ratios) < 1, current fee is low, else high.  
+The index is updated every 10 mins (~block) and moving averages every day.    
 
 ## Prerequisites:
 nodejs, npm, postgres server
@@ -16,24 +17,6 @@ nodejs, npm, postgres server
 2. npm install  
    tsc  
    npm start    
-
-## Spec:
-
-**OPs:**
-
-  Do every day:
-  1. calculate moving averages of 1. past 365 days, 2. past 30 days  
-  2. update chart  
-
-  Do every block:
-  1. fetch current fee rate   
-  2. calculate fee-avg ratio: currrent fee rate/moving averages  
-  3. update chart   
-
-  **SERVICES:**
-  
-  1. API providing latest fee-avg ratio
-  2. WS providing subscription to latest fee-avg ratio
 
 ## To Do:
 1. render basic charts to visualize the index.
@@ -48,7 +31,7 @@ nodejs, npm, postgres server
    Sample signature used for dev. Resolve issue for prod...
 
 ## Testing:
-
+Start service then test from terminal:  
 ### API: 
    curl http://localhost:3561/service/index
 ### WS: 
