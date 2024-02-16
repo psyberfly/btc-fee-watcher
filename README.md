@@ -17,9 +17,11 @@ NodeJs (Typescript) + Postgres
 ## Prerequisites:
 nodejs, npm, postgres server
 
-## Usage:
-1. Ensure your Postgres DB is online.
-2. npm install  
+## Setup:
+1. Ensure your Postgres DB is online. Then, on a linux:
+2. cp .env.example .env
+3. Write env vars to .env
+4. npm install  
    npx prisma migrate deploy   
    tsc  
    npm start    
@@ -36,7 +38,7 @@ nodejs, npm, postgres server
    'No response signing key found!. Run $ ditto crpf sats_sig'
    Sample signature used for dev. Resolve issue for prod...
 
-## Testing:
+## Usage/Test:
 Start service then test from terminal:  
 ### API: 
    curl http://localhost:3561/service/index
