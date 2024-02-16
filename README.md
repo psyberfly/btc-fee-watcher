@@ -20,6 +20,7 @@ nodejs, npm, postgres server
 ## Usage:
 1. Ensure your Postgres DB is online.
 2. npm install  
+   npx prisma migrate deploy   
    tsc  
    npm start    
 
