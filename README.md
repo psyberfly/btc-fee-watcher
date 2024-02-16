@@ -18,7 +18,7 @@ NodeJs (Typescript) + Postgres
 nodejs, npm, postgres server
 
 ## Usage:
-1. sudo chmod +x setup.sh
+1. sudo chmod +x setup.sh start.sh
 2. sh setup.sh
 3. ensure that the db from the setup is running 
 3. sh start.sh    
