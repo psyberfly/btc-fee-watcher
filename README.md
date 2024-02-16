@@ -19,8 +19,8 @@ nodejs, npm, postgres server
 
 ## Setup:
 1. Ensure your Postgres DB is online. Then, on a linux:
-2. cp .env.example .env
-3. Write env vars to .env
+2. cp .example.env .env
+3. Update your env vars in .env
 4. npm install  
    npx prisma migrate deploy   
    tsc  
