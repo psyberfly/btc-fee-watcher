@@ -37,12 +37,19 @@ nodejs, npm, postgres server
 
 ## To Do:
 1. currently last year's fee estimate history is loaded locally from csv file. CSV File is loaded by host via psql. Write an init procedure in server to load it. 
-2. Test DB, API, WS
+2. Test WS
 3. Change nodejs host runtime to docker container runtime
 4. Write setup scripts
+5. Change intervals of IndexWatcher to prod internvals before deploying. 
 
 ## Known Issues:
 1. Signing key for lib/http/handler.ts not generated:
    'No response signing key found!. Run $ ditto crpf sats_sig'
    Sample signature used for dev. Resolve issue for prod...
 
+## Testing:
+
+### API: 
+   curl http://localhost:3561/service/index
+### WS: 
+   websocat -H="Accept: application/json" -H="Content-Type: application/json" ws://localhost:3572/stream?service=index

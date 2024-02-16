@@ -48,8 +48,6 @@ export class MovingAverageOp implements IMovingAverageOp {
 
       const yearlyAverage = yearlySum / feeHistoryLastYear.length;
 
-      console.log({ yearlyAverage });
-
       const feeHistoryLastMonth = await this.feeOp.readLast30Days();
 
       if (feeHistoryLastMonth instanceof Error) {

@@ -36,11 +36,36 @@ export class AlertStreamServer {
         });
       }
 
-      AlertStreamServer.alertStreamServer.on("connection", (ws) => {
-        ws.on("message", (message) => {
-          console.log("Received:", message);
+      AlertStreamServer.alertStreamServer.on("connection", (client, req) => {
+        console.log("WS connection opened");
+        const servicePath = req.url.split("?service=")[1];
+        //Currently we broadcast to all subscribers if they stream to the offered service, since only 1 service is offered.
+        //When upgrading to multiple services, attach tag to the client: client["service"]="index" and filter by tag in broadcastAlert
+        if (servicePath !== alertStreamPath) {
+          client.send(
+            "Error: 404; Message: Service not found. Please check the service you want to stream.",
+          );
+          client.close();
+        }
+
+        client.send(
+          "Hello from BTC Fee Watcher! You are now streaming our index...",
+        );
+        client.on("message", (message) => {
+          console.log("WS message received:", message.toString());
+        });
+        client.on("error", (message) => {
+          console.error("WS connection error:", message);
+        });
+        client.on("close", (message: any) => {
+          console.log("WS connection closed");
         });
       });
+
+      AlertStreamServer.alertStreamServer.on("error", (error) => {
+        console.error("WS Error:", error);
+      });
+
       server.listen(port, () => {
         console.log(`WS Server running on port ${port}`);
       });

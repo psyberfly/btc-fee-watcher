@@ -3,7 +3,7 @@ import { ONE_DAY_MS, ONE_MINUTE_MS, TEN_MINUTES_MS } from "../lib/time/time";
 import { FeeOp } from "../op/fee_estimate/fee_estimate";
 import { IndexOp } from "../op/fee_index/fee_index";
 import { MovingAverageOp } from "../op/moving_average/moving_average";
-import { AlertStreamServer } from "./wss";
+import { AlertStreamServer } from "./ws";
 
 export async function runIndexWatcher() {
   try {
