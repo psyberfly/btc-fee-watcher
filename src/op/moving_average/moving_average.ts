@@ -17,7 +17,17 @@ export class MovingAverageOp implements IMovingAverageOp {
     return latestMovingAvg;
   }
 
-  async update(): Promise<boolean | Error> {
+  async checkExists(dateUTC: string): Promise<boolean | Error> {
+    const exists = await this.store.checkRowExistsByDate(dateUTC);
+
+    if (exists instanceof Error) {
+      return handleError(exists);
+    }
+
+    return exists;
+  }
+
+  async create(): Promise<boolean | Error> {
     try {
       const feeHistoryLastYear = await this.feeOp.readLast365Days();
 
@@ -34,6 +44,8 @@ export class MovingAverageOp implements IMovingAverageOp {
       );
 
       const yearlyAverage = yearlySum / feeHistoryLastYear.length;
+
+      console.log({ yearlyAverage });
 
       const feeHistoryLastMonth = await this.feeOp.readLast30Days();
 
@@ -53,7 +65,7 @@ export class MovingAverageOp implements IMovingAverageOp {
 
       const update: FeeEstMovingAverage = {
         id: null, //Added by DB
-        createdAt: new Date().toUTCString(),
+        createdAt: null, //Added by DB
         last365Days: yearlyAverage,
         last30Days: monthlyAverage,
       };

@@ -38,7 +38,7 @@ export class PgStore {
       await client.query("COMMIT");
       return res;
     } catch (e) {
-      console.error("PgStore: Error executing query!");
+      console.error(`PgStore: Error executing query! Query: ${query}`);
       console.error(e);
       await client.query("ROLLBACK");
       return handleError(e);

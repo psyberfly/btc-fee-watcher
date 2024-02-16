@@ -18,14 +18,23 @@ export async function runIndexWatcher() {
     // every day:
     setInterval(async () => {
       console.log("Updating Moving Average...");
-      const isMovingAvgUpdated = await movingAverageOp.update();
+      const today = new Date().toISOString()
+      const isExistMovingAvgToday = await movingAverageOp.checkExists(today);
 
-      if (isMovingAvgUpdated instanceof Error) {
-        console.error("Error updating Moving Average!");
-        return handleError(isMovingAvgUpdated);
+      if (!isExistMovingAvgToday) {
+        console.log("Creating Moving Average for today...");
+        const isMovingAvgCreated = await movingAverageOp.create();
+
+        if (isMovingAvgCreated instanceof Error) {
+          console.error("Error creating Moving Average!");
+          return handleError(isMovingAvgCreated);
+        }
+        // update chart
+      } else {
+        console.log("Moving Average already exists for today.");
       }
-      // update chart
-    }, ONE_DAY_MS);
+    }, ONE_MINUTE_MS //change to 24 hours for prod
+    );
 
     // every 10 mins (block):
     setInterval(async () => {

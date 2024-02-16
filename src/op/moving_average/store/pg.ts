@@ -78,4 +78,22 @@ export class MovingAverageStore {
 
     return true;
   }
+
+  async checkRowExistsByDate(dateUTC: string): Promise<boolean | Error> {
+    const query = `
+    SELECT COUNT(*) AS count
+    FROM ${this.tableName}
+    WHERE
+    DATE(created_at) = CURRENT_DATE::timestamp with time zone;
+        `;
+    const result = await PgStore.execQuery(query);
+
+    if (result instanceof Error) {
+      return handleError(result);
+    }
+
+    const exists = result.rows[0]["count"] > 0;
+
+    return exists;
+  }
 }

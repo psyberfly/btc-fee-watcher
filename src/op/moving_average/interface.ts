@@ -2,7 +2,7 @@
 
 export interface FeeEstMovingAverage {
   id: number;
-  createdAt: String;
+  createdAt: string;
   last365Days: number;
   last30Days: number;
 }
@@ -10,5 +10,6 @@ export interface FeeEstMovingAverage {
 export interface IMovingAverageOp {
   //invoked daily
   readLatest(): Promise<FeeEstMovingAverage | Error>;
-  update(): Promise<boolean | Error>;
+  create(): Promise<boolean | Error>;
+  checkExists(DateUTC: string): Promise<boolean | Error>;
 }

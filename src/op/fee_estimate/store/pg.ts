@@ -79,7 +79,7 @@ export class FeeEstStore {
     const feeEstHistory: FeeEstimate[] = result.rows.map((row: any) => ({
       id: row["id"],
       time: row["time"],
-      satsPerByte: row["sats_per_byte"],
+      satsPerByte: parseFloat(row["sats_per_byte"]),
     }));
     return feeEstHistory;
   }

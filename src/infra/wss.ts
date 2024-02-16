@@ -46,8 +46,6 @@ export class AlertStreamServer {
     } catch (error) {
       console.error("Error starting WS Server:", error);
       process.exit(1);
-    } finally {
-      //graceful shutdown
     }
   }
 

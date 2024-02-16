@@ -50,46 +50,67 @@ export class IndexStore {
   }
 
   async readLatest(): Promise<Index | Error> {
+    //3 SQL queries can be combined into one with JOINS and AS...
     try {
-      //moving avg and index tables both have createdAt and id. Update query to disambiguate the two!!
-      const query = `
-    SELECT ${this.tableName}.*, ${this.tableNameFeeEst}.*, ${this.tableNameMovingAverage}.*
-    FROM ${this.tableName}
-    INNER JOIN ${this.tableNameFeeEst} ON ${this.tableName}.fee_estimate_id = ${this.tableNameFeeEst}.id
-    INNER JOIN ${this.tableNameMovingAverage} ON ${this.tableName}.moving_average_id = ${this.tableNameMovingAverage}.id
-    WHERE ${this.tableName}.id = (
-        SELECT id
-        FROM ${this.tableName}
-        ORDER BY created_at DESC
-        LIMIT 1
-    );
-    
-    `;
-      const result = await PgStore.execQuery(query);
+      const indexQuery = `
+      SELECT *
+      FROM ${this.tableName}
+      ORDER BY created_at DESC
+      LIMIT 1;  
+        `;
 
-      if (result instanceof Error) {
-        return handleError(result);
+      const indexRes = await PgStore.execQuery(indexQuery);
+
+      if (indexRes instanceof Error) {
+        return handleError(indexRes);
+      }
+
+      const feeEstimateId = indexRes[0]["fee_estiamte_id"];
+      const movingAverageId = indexRes[0]["moving_average_id"];
+
+      const feeEstimateQuery = `
+        SELECT *
+        FROM ${this.tableNameFeeEst}
+        WHERE id= ${feeEstimateId} 
+        `;
+
+      const feeEstimateRes = await PgStore.execQuery(feeEstimateQuery);
+
+      if (feeEstimateRes instanceof Error) {
+        return handleError(feeEstimateRes);
+      }
+
+      const movingAverageQuery = `
+        SELECT *
+        FROM ${this.tableNameMovingAverage}
+        WHERE id= ${movingAverageId} 
+        `;
+
+      const movingAverageRes = await PgStore.execQuery(movingAverageQuery);
+
+      if (movingAverageRes instanceof Error) {
+        return handleError(movingAverageRes);
       }
 
       const feeEst: FeeEstimate = {
-        id: result[0]["id"],
-        time: result[0]["time"],
-        satsPerByte: result[0]["sats_per_byte"],
+        id: feeEstimateRes[0]["id"],
+        time: feeEstimateRes[0]["time"],
+        satsPerByte: feeEstimateRes[0]["sats_per_byte"],
       };
 
       const movingAverage: FeeEstMovingAverage = {
-        id: result[0]["id"],
-        createdAt: result[0]["created_at"],
-        last365Days: result[0]["last_365_days"],
-        last30Days: result[0]["last_30_days"],
+        id: movingAverageRes[0]["id"],
+        createdAt: movingAverageRes[0]["created_at"],
+        last365Days: movingAverageRes[0]["last_365_days"],
+        last30Days: movingAverageRes[0]["last_30_days"],
       };
 
       const index: Index = {
         feeEstimate: feeEst,
         movingAverage: movingAverage,
-        ratioLast365Days: result[0]["ratio_last_365_days"],
-        ratioLast30Days: result[0]["ratio_last_30_days"],
-        createdAt: result[0]["created_at"],
+        ratioLast365Days: indexRes[0]["ratio_last_365_days"],
+        ratioLast30Days: indexRes[0]["ratio_last_30_days"],
+        createdAt: indexRes[0]["created_at"],
       };
 
       return index;
