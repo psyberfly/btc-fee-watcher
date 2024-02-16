@@ -36,8 +36,8 @@ nodejs, npm, postgres server
   2. WS providing subscription to latest fee-avg ratio
 
 ## To Do:
-1. currently last year's fee estimate history is loaded locally from csv file. CSV File is loaded by host via psql. Write an init procedure in server to load it. 
-2. Test WS
+1. render basic charts to visualize the index.
+2. currently last year's fee estimate history is loaded locally from csv file. CSV File is loaded by host via psql. Write an init procedure in server to load it. 
 3. Change nodejs host runtime to docker container runtime
 4. Write setup scripts
 5. Change intervals of IndexWatcher to prod internvals before deploying. 
