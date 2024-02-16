@@ -11,6 +11,9 @@ The index is updated every 10 mins (~block) and moving averages every day.
 Fee estimates from [mempool_recommended_fee_api](https://mempool.space/docs/api/rest#get-recommended-fees)  
 Fee estimate history from [txsats api_specific_fee_estimate](https://txstats.com/d/000000011/fee-estimation?orgId=1&viewPanel=2&var-source=mempool.space)  
 
+## Stack:
+NodeJs (Typescript) + Postgres
+
 ## Prerequisites:
 nodejs, npm, postgres server
 
