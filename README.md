@@ -38,3 +38,10 @@ nodejs, npm, postgres server
 ## To Do:
 1. currently last year's fee estimate history is loaded locally from csv file. CSV File is loaded by host via psql. Write an init procedure in server to load it. 
 2. Test DB, API, WS
+
+## Known Issues:
+1. Signing key for lib/http/handler.ts not generated:
+   'No response signing key found!. Run $ ditto crpf sats_sig'
+   Sample signature used for dev. Resolve issue for prod...
+
+<!-- 2. All prisma stores prisma queries are returning objects not types. Convert to types before returning... -->

@@ -6,6 +6,7 @@ import http from "http";
 import * as dotenv from "dotenv";
 import { handleError } from "../lib/errors/e";
 import { FeeIndex } from "@prisma/client";
+import { IndexResponse } from "../op/fee_index/interface";
 dotenv.config();
 
 export class AlertStreamServer {
@@ -49,7 +50,7 @@ export class AlertStreamServer {
     }
   }
 
-  public broadcastAlert(data: FeeIndex): boolean | Error {
+  public broadcastAlert(data: IndexResponse): boolean | Error {
     try {
       // Broadcast to all connected clients
       AlertStreamServer.alertStreamServer.clients.forEach((client) => {

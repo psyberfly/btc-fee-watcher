@@ -8,15 +8,14 @@ export async function handleGetIndex(req, res) {
   console.log("Handling req....");
   const request = parseRequest(req);
   try {
-    let response = await watcherService.getIndex();
-    if (response instanceof Error) throw response;
-    else respond(200, response, res, request);
+    let index = await watcherService.getIndex();
+
+    if (index instanceof Error) {
+      throw index;
+    }
+    await respond(200, index, res, request);
   } catch (e) {
     const result = filterError(e, r_500, request);
-    respond(result.code, result.message, res, request);
+    await respond(result.code, result.message, res, request);
   }
-}
-
-interface ExtWebSocket extends WebSocket {
-  isAlive: boolean;
 }

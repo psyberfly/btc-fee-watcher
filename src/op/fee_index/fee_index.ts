@@ -4,7 +4,7 @@ import { FeeOp } from "../fee_estimate/fee_estimate";
 //import { FeeEstimate } from "../fee_estimate/interface";
 //import { FeeEstPgStore } from "../fee_estimate/store/pg";
 //import { MovingAverageStore } from "../moving_average/store/pg";
-import { IIndexOp } from "./interface";
+import { IIndexOp, IndexResponse } from "./interface";
 import { FeeIndexPrismaStore } from "./store/prisma";
 import { MovingAveragePrismaStore } from "../moving_average/store/prisma";
 import { FeeEstimatePrismaStore } from "../fee_estimate/store/prisma";
@@ -23,13 +23,13 @@ export class IndexOp implements IIndexOp {
   private movingAvgStore = new MovingAveragePrismaStore();
   private feeEstStore = new FeeEstimatePrismaStore();
 
-  async readLatest(): Promise<Error | FeeIndex> {
-    const index = await this.store.readLatest();
-    if (index instanceof Error) {
-      return handleError(index);
+  async readLatest(): Promise<Error | IndexResponse> {
+    const res = await this.store.fetchLatest();
+    if (res instanceof Error) {
+      return handleError(res);
     }
 
-    return index;
+    return res;
   }
 
   async udpateIndex(): Promise<boolean | Error> {
