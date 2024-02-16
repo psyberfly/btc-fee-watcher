@@ -17,14 +17,20 @@ NodeJs (Typescript) + Postgres
 ## Prerequisites:
 nodejs, npm, postgres server
 
-## Setup:
-1. Ensure your Postgres DB is online. Then, on a linux:
-2. cp .example.env .env
-3. Update your env vars in .env
-4. npm install  
-   npx prisma migrate deploy   
-   tsc  
-   npm start    
+## Usage:
+1. sudo chmod +x setup.sh
+2. sh setup.sh
+3. ensure that the db from the setup is running 
+3. sh start.sh    
+
+## Test:
+Start service then test from terminal:  
+### API: 
+   curl http://localhost:3561/service/index
+### WS: 
+   websocat -H="Accept: application/json" -H="Content-Type: application/json" ws://localhost:3572/stream?service=index
+
+## WIP:
 
 ## To Do:
 1. render basic charts to visualize the index.
@@ -38,9 +44,3 @@ nodejs, npm, postgres server
    'No response signing key found!. Run $ ditto crpf sats_sig'
    Sample signature used for dev. Resolve issue for prod...
 
-## Usage/Test:
-Start service then test from terminal:  
-### API: 
-   curl http://localhost:3561/service/index
-### WS: 
-   websocat -H="Accept: application/json" -H="Content-Type: application/json" ws://localhost:3572/stream?service=index
